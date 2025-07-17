@@ -1,0 +1,44 @@
+<div class="mb-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo ao Meu Blog</h1>
+    <p class="text-xl text-gray-600">Compartilhando ideias, experiências e conhecimento através de posts em markdown.</p>
+</div>
+
+<div class="space-y-8">
+    {{#posts}}
+    <article class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
+        <header class="mb-4">
+            <h2 class="text-2xl font-semibold mb-2">
+                <a href="/posts/{{slug}}" class="text-gray-900 hover:text-blue-600 no-underline">
+                    {{title}}
+                </a>
+            </h2>
+            <div class="flex items-center text-sm text-gray-500 space-x-4">
+                <time datetime="{{isoDate}}">{{formattedDate}}</time>
+                {{#author}}<span>Por {{author}}</span>{{/author}}
+            </div>
+        </header>
+        
+        {{#excerpt}}
+        <div class="prose text-gray-600 mb-4">
+            <p>{{excerpt}}</p>
+        </div>
+        {{/excerpt}}
+        
+        <footer>
+            <a href="/posts/{{slug}}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                Ler mais
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </footer>
+    </article>
+    {{/posts}}
+    
+    {{^posts}}
+    <div class="bg-white rounded-lg shadow-sm border p-8 text-center">
+        <h3 class="text-xl font-medium text-gray-900 mb-2">Nenhum post ainda</h3>
+        <p class="text-gray-600">Os posts do blog aparecerão aqui quando forem criados.</p>
+    </div>
+    {{/posts}}
+</div>
