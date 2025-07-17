@@ -1,0 +1,26 @@
+{
+  "name": "jaison-blog",
+  "version": "1.0.0",
+  "description": "Meu blog pessoal",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js && npx http-server public -p 3000",
+    "clean": "rm -rf public/*"
+  },
+  "dependencies": {
+    "marked": "^9.1.6",
+    "front-matter": "^4.0.2",
+    "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "postcss-cli": "^10.1.0",
+    "http-server": "^14.1.1"
+  },
+  "keywords": ["blog", "markdown", "static-site"],
+  "author": "Jaison Schmidt",
+  "license": "MIT"
+}
