@@ -1,4 +1,4 @@
-# Meu Blog Pessoal
+# Jaison's Blog
 
 Um blog simples e moderno construído com Markdown, Node.js e Tailwind CSS.
 

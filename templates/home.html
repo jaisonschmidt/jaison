@@ -1,11 +1,30 @@
-<div class="mb-12">
-    <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo ao Meu Blog</h1>
+<div class="mb-12 text-center">
+    <!-- Photo placeholder -->
+    <div class="mb-6 flex justify-center">
+        <div class="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center">
+            <svg class="w-16 h-16 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+        </div>
+    </div>
+    
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo ao meu blog</h1>
     <p class="text-xl text-gray-600">Compartilhando ideias, experiências e conhecimento através de posts em markdown.</p>
+    
+    <!-- Search box -->
+    <div class="mt-8 max-w-lg mx-auto">
+        <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Buscar posts..." 
+            class="w-full px-6 py-4 text-gray-700 bg-white border-2 border-gray-200 rounded-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-center hover:shadow-xl hover:border-gray-300"
+        >
+    </div>
 </div>
 
-<div class="space-y-8">
+<div id="postsContainer" class="space-y-8">
     {{#posts}}
-    <article class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
+    <article class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow post-item" data-title="{{title}}" data-excerpt="{{excerpt}}">
         <header class="mb-4">
             <h2 class="text-2xl font-semibold mb-2">
                 <a href="/posts/{{slug}}" class="text-gray-900 hover:text-blue-600 no-underline">
@@ -42,3 +61,179 @@
     </div>
     {{/posts}}
 </div>
+
+<!-- Pagination controls -->
+<div id="paginationContainer" class="mt-12 flex justify-center">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-2">
+        <div class="flex items-center space-x-2">
+            <button id="prevPage" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                ← Anterior
+            </button>
+            <div id="pageNumbers" class="flex items-center space-x-1 mx-1">
+                <!-- Page numbers will be inserted here -->
+            </div>
+            <button id="nextPage" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                Próximo →
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- No results message -->
+<div id="noResults" class="hidden bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+    <div class="max-w-sm mx-auto">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.664-2.64m-.232-2.718A7.996 7.996 0 0112 3c.75 0 1.468.103 2.146.295m-6.326 8.777A7.998 7.998 0 0112 21c2.34 0 4.29-1.009 5.664-2.64m-11.328 0C5.51 17.747 5 16.402 5 15s.51-2.747 1.336-3.36"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum post encontrado</h3>
+        <p class="text-gray-500">Tente buscar com outros termos.</p>
+    </div>
+</div>
+
+<script>
+// Configuration
+const POSTS_PER_PAGE = {{postsPerPage}}; // Configurable posts per page
+
+// Get all posts
+const allPosts = Array.from(document.querySelectorAll('.post-item'));
+let filteredPosts = [...allPosts];
+let currentPage = 1;
+
+// Elements
+const searchInput = document.getElementById('searchInput');
+const postsContainer = document.getElementById('postsContainer');
+const paginationContainer = document.getElementById('paginationContainer');
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
+const pageNumbers = document.getElementById('pageNumbers');
+const noResults = document.getElementById('noResults');
+
+// Search functionality
+function filterPosts(searchTerm) {
+    if (!searchTerm.trim()) {
+        filteredPosts = [...allPosts];
+    } else {
+        filteredPosts = allPosts.filter(post => {
+            const title = post.dataset.title.toLowerCase();
+            const excerpt = post.dataset.excerpt.toLowerCase();
+            const term = searchTerm.toLowerCase();
+            return title.includes(term) || excerpt.includes(term);
+        });
+    }
+    currentPage = 1;
+    showCurrentPage();
+}
+
+// Pagination functionality
+function showCurrentPage() {
+    const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+    const endIndex = startIndex + POSTS_PER_PAGE;
+    const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+    
+    // Hide all posts
+    allPosts.forEach(post => post.style.display = 'none');
+    
+    // Show current page posts
+    const currentPosts = filteredPosts.slice(startIndex, endIndex);
+    currentPosts.forEach(post => post.style.display = 'block');
+    
+    // Update pagination controls
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+    
+    if (totalPages > 0) {
+        // Create page number buttons
+        createPageNumbers(totalPages);
+        paginationContainer.style.display = 'flex';
+        noResults.style.display = 'none';
+    } else {
+        paginationContainer.style.display = 'none';
+        noResults.style.display = 'block';
+    }
+}
+
+// Create page number buttons
+function createPageNumbers(totalPages) {
+    pageNumbers.innerHTML = '';
+    
+    // Show page numbers with smart truncation
+    const maxVisible = 5; // Maximum visible page numbers
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    
+    // Adjust start if we're near the end
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+    
+    // Add first page and ellipsis if needed
+    if (startPage > 1) {
+        addPageButton(1);
+        if (startPage > 2) {
+            addEllipsis();
+        }
+    }
+    
+    // Add visible page numbers
+    for (let i = startPage; i <= endPage; i++) {
+        addPageButton(i);
+    }
+    
+    // Add ellipsis and last page if needed
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            addEllipsis();
+        }
+        addPageButton(totalPages);
+    }
+}
+
+// Add page button
+function addPageButton(pageNum) {
+    const button = document.createElement('button');
+    button.textContent = pageNum;
+    button.className = pageNum === currentPage 
+        ? 'px-3 py-2 text-sm font-semibold text-white bg-blue-600 border border-blue-600 rounded-xl hover:bg-blue-700 shadow-md transform scale-105 transition-all duration-200'
+        : 'px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 shadow-sm';
+    
+    button.addEventListener('click', () => {
+        currentPage = pageNum;
+        showCurrentPage();
+    });
+    
+    pageNumbers.appendChild(button);
+}
+
+// Add ellipsis
+function addEllipsis() {
+    const ellipsis = document.createElement('span');
+    ellipsis.textContent = '...';
+    ellipsis.className = 'px-3 py-2 text-sm font-medium text-gray-400 select-none';
+    pageNumbers.appendChild(ellipsis);
+}
+
+// Event listeners
+searchInput.addEventListener('input', (e) => {
+    filterPosts(e.target.value);
+});
+
+prevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        showCurrentPage();
+    }
+});
+
+nextPageBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+    if (currentPage < totalPages) {
+        currentPage++;
+        showCurrentPage();
+    }
+});
+
+// Initialize
+showCurrentPage();
+</script>

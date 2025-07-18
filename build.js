@@ -11,6 +11,12 @@ const PUBLIC_DIR = 'public';
 const TEMPLATES_DIR = 'templates';
 const POSTS_OUTPUT_DIR = path.join(PUBLIC_DIR, 'posts');
 
+// Blog configuration
+const BLOG_CONFIG = {
+    postsPerPage: 2, // Set to 2 for testing, can be easily changed to up to 10
+    maxPostsPerPage: 10
+};
+
 // Ensure output directories exist
 if (!fs.existsSync(PUBLIC_DIR)) {
     fs.mkdirSync(PUBLIC_DIR, { recursive: true });
@@ -140,15 +146,33 @@ function generatePostPages(posts) {
     });
 }
 
-// Generate home page
+// Generate about page
+function generateAboutPage() {
+    const aboutTemplate = path.join(TEMPLATES_DIR, 'about.html');
+    const layoutTemplate = path.join(TEMPLATES_DIR, 'layout.html');
+    
+    const aboutContent = renderTemplate(aboutTemplate, {});
+    const finalHtml = renderTemplate(layoutTemplate, {
+        title: 'Sobre',
+        description: 'Conheça mais sobre Jaison Schmidt, desenvolvedor e criador do blog',
+        content: aboutContent
+    });
+    
+    const outputPath = path.join(PUBLIC_DIR, 'sobre.html');
+    fs.writeFileSync(outputPath, finalHtml);
+    console.log(`Generated: ${outputPath}`);
+}
 function generateHomePage(posts) {
     const homeTemplate = path.join(TEMPLATES_DIR, 'home.html');
     const layoutTemplate = path.join(TEMPLATES_DIR, 'layout.html');
     
-    const homeContent = renderTemplate(homeTemplate, { posts });
+    const homeContent = renderTemplate(homeTemplate, { 
+        posts,
+        postsPerPage: BLOG_CONFIG.postsPerPage 
+    });
     const finalHtml = renderTemplate(layoutTemplate, {
         title: 'Home',
-        description: 'Meu blog pessoal com posts sobre tecnologia e desenvolvimento',
+        description: 'Jaison\'s Blog - Compartilhando ideias sobre tecnologia e desenvolvimento',
         content: homeContent
     });
     
@@ -185,6 +209,7 @@ function build() {
     // Generate pages
     generatePostPages(posts);
     generateHomePage(posts);
+    generateAboutPage();
     
     console.log('✅ Build completed successfully!');
     console.log(`📁 Output directory: ${PUBLIC_DIR}`);
