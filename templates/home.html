@@ -1,11 +1,37 @@
-<div class="mb-12">
-    <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo ao Meu Blog</h1>
+<div class="mb-12 text-center">
+    <!-- Photo placeholder -->
+    <div class="mb-6 flex justify-center">
+        <div class="w-32 h-32 bg-gray-300 rounded-full flex items-center justify-center">
+            <svg class="w-16 h-16 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+        </div>
+    </div>
+    
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Bem-vindo ao meu blog</h1>
     <p class="text-xl text-gray-600">Compartilhando ideias, experiências e conhecimento através de posts em markdown.</p>
+    
+    <!-- Search box -->
+    <div class="mt-8 max-w-md mx-auto">
+        <div class="relative">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Buscar posts..." 
+                class="w-full px-4 py-2 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+            >
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="space-y-8">
+<div id="postsContainer" class="space-y-8">
     {{#posts}}
-    <article class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
+    <article class="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow post-item" data-title="{{title}}" data-excerpt="{{excerpt}}">
         <header class="mb-4">
             <h2 class="text-2xl font-semibold mb-2">
                 <a href="/posts/{{slug}}" class="text-gray-900 hover:text-blue-600 no-underline">
@@ -42,3 +68,107 @@
     </div>
     {{/posts}}
 </div>
+
+<!-- Pagination controls -->
+<div id="paginationContainer" class="mt-8 flex justify-center">
+    <div class="flex space-x-2">
+        <button id="prevPage" class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Anterior
+        </button>
+        <span id="pageInfo" class="px-4 py-2 text-sm font-medium text-gray-700"></span>
+        <button id="nextPage" class="px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+            Próximo
+        </button>
+    </div>
+</div>
+
+<!-- No results message -->
+<div id="noResults" class="hidden bg-white rounded-lg shadow-sm border p-8 text-center">
+    <h3 class="text-xl font-medium text-gray-900 mb-2">Nenhum post encontrado</h3>
+    <p class="text-gray-600">Tente buscar com outros termos.</p>
+</div>
+
+<script>
+// Configuration
+const POSTS_PER_PAGE = {{postsPerPage}}; // Configurable posts per page
+
+// Get all posts
+const allPosts = Array.from(document.querySelectorAll('.post-item'));
+let filteredPosts = [...allPosts];
+let currentPage = 1;
+
+// Elements
+const searchInput = document.getElementById('searchInput');
+const postsContainer = document.getElementById('postsContainer');
+const paginationContainer = document.getElementById('paginationContainer');
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
+const pageInfo = document.getElementById('pageInfo');
+const noResults = document.getElementById('noResults');
+
+// Search functionality
+function filterPosts(searchTerm) {
+    if (!searchTerm.trim()) {
+        filteredPosts = [...allPosts];
+    } else {
+        filteredPosts = allPosts.filter(post => {
+            const title = post.dataset.title.toLowerCase();
+            const excerpt = post.dataset.excerpt.toLowerCase();
+            const term = searchTerm.toLowerCase();
+            return title.includes(term) || excerpt.includes(term);
+        });
+    }
+    currentPage = 1;
+    showCurrentPage();
+}
+
+// Pagination functionality
+function showCurrentPage() {
+    const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+    const endIndex = startIndex + POSTS_PER_PAGE;
+    const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+    
+    // Hide all posts
+    allPosts.forEach(post => post.style.display = 'none');
+    
+    // Show current page posts
+    const currentPosts = filteredPosts.slice(startIndex, endIndex);
+    currentPosts.forEach(post => post.style.display = 'block');
+    
+    // Update pagination controls
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+    
+    if (totalPages > 0) {
+        pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
+        paginationContainer.style.display = 'flex';
+        noResults.style.display = 'none';
+    } else {
+        paginationContainer.style.display = 'none';
+        noResults.style.display = 'block';
+    }
+}
+
+// Event listeners
+searchInput.addEventListener('input', (e) => {
+    filterPosts(e.target.value);
+});
+
+prevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+        currentPage--;
+        showCurrentPage();
+    }
+});
+
+nextPageBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
+    if (currentPage < totalPages) {
+        currentPage++;
+        showCurrentPage();
+    }
+});
+
+// Initialize
+showCurrentPage();
+</script>

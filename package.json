@@ -1,7 +1,7 @@
 {
   "name": "jaison-blog",
   "version": "1.0.0",
-  "description": "Meu blog pessoal",
+  "description": "Jaison's Blog",
   "main": "build.js",
   "scripts": {
     "build": "node build.js",
