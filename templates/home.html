@@ -12,20 +12,13 @@
     <p class="text-xl text-gray-600">Compartilhando ideias, experiências e conhecimento através de posts em markdown.</p>
     
     <!-- Search box -->
-    <div class="mt-8 max-w-md mx-auto">
-        <div class="relative">
-            <input 
-                type="text" 
-                id="searchInput" 
-                placeholder="Buscar posts..." 
-                class="w-full px-4 py-2 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-            >
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
-        </div>
+    <div class="mt-8 max-w-lg mx-auto">
+        <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Buscar posts..." 
+            class="w-full px-6 py-4 text-gray-700 bg-white border-2 border-gray-200 rounded-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 text-center hover:shadow-xl hover:border-gray-300"
+        >
     </div>
 </div>
 
@@ -70,24 +63,33 @@
 </div>
 
 <!-- Pagination controls -->
-<div id="paginationContainer" class="mt-8 flex justify-center">
-    <div class="flex items-center space-x-1">
-        <button id="prevPage" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-            Anterior
-        </button>
-        <div id="pageNumbers" class="flex items-center space-x-1 mx-2">
-            <!-- Page numbers will be inserted here -->
+<div id="paginationContainer" class="mt-12 flex justify-center">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-2">
+        <div class="flex items-center space-x-2">
+            <button id="prevPage" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                ← Anterior
+            </button>
+            <div id="pageNumbers" class="flex items-center space-x-1 mx-1">
+                <!-- Page numbers will be inserted here -->
+            </div>
+            <button id="nextPage" class="px-4 py-2.5 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 hover:text-gray-800 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                Próximo →
+            </button>
         </div>
-        <button id="nextPage" class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-            Próximo
-        </button>
     </div>
 </div>
 
 <!-- No results message -->
-<div id="noResults" class="hidden bg-white rounded-lg shadow-sm border p-8 text-center">
-    <h3 class="text-xl font-medium text-gray-900 mb-2">Nenhum post encontrado</h3>
-    <p class="text-gray-600">Tente buscar com outros termos.</p>
+<div id="noResults" class="hidden bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+    <div class="max-w-sm mx-auto">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.664-2.64m-.232-2.718A7.996 7.996 0 0112 3c.75 0 1.468.103 2.146.295m-6.326 8.777A7.998 7.998 0 0112 21c2.34 0 4.29-1.009 5.664-2.64m-11.328 0C5.51 17.747 5 16.402 5 15s.51-2.747 1.336-3.36"/>
+            </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">Nenhum post encontrado</h3>
+        <p class="text-gray-500">Tente buscar com outros termos.</p>
+    </div>
 </div>
 
 <script>
@@ -193,8 +195,8 @@ function addPageButton(pageNum) {
     const button = document.createElement('button');
     button.textContent = pageNum;
     button.className = pageNum === currentPage 
-        ? 'px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700'
-        : 'px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50';
+        ? 'px-3 py-2 text-sm font-semibold text-white bg-blue-600 border border-blue-600 rounded-xl hover:bg-blue-700 shadow-md transform scale-105 transition-all duration-200'
+        : 'px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 shadow-sm';
     
     button.addEventListener('click', () => {
         currentPage = pageNum;
@@ -208,7 +210,7 @@ function addPageButton(pageNum) {
 function addEllipsis() {
     const ellipsis = document.createElement('span');
     ellipsis.textContent = '...';
-    ellipsis.className = 'px-3 py-2 text-sm font-medium text-gray-500';
+    ellipsis.className = 'px-3 py-2 text-sm font-medium text-gray-400 select-none';
     pageNumbers.appendChild(ellipsis);
 }
 
