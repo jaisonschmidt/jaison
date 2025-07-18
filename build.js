@@ -161,6 +161,14 @@ function generateAboutPage() {
     const outputPath = path.join(PUBLIC_DIR, 'sobre.html');
     fs.writeFileSync(outputPath, finalHtml);
     console.log(`Generated: ${outputPath}`);
+
+    // Cria /public/sobre/index.html para acessar via /sobre
+    const sobreDir = path.join(PUBLIC_DIR, 'sobre');
+    if (!fs.existsSync(sobreDir)) {
+        fs.mkdirSync(sobreDir, { recursive: true });
+    }
+    fs.writeFileSync(path.join(sobreDir, 'index.html'), finalHtml);
+    console.log(`Generated: ${path.join(sobreDir, 'index.html')}`);
 }
 function generateHomePage(posts) {
     const homeTemplate = path.join(TEMPLATES_DIR, 'home.html');
@@ -201,19 +209,33 @@ function build() {
     
     // Build CSS first
     buildCSS();
-    
+
+    // Copiar imagem de perfil para public/img
+    const imgSrc = path.join('src', 'img', '1587503019397.jpeg');
+    const imgDestDir = path.join(PUBLIC_DIR, 'img');
+    const imgDest = path.join(imgDestDir, '1587503019397.jpeg');
+    if (!fs.existsSync(imgDestDir)) {
+        fs.mkdirSync(imgDestDir, { recursive: true });
+    }
+    if (fs.existsSync(imgSrc)) {
+        fs.copyFileSync(imgSrc, imgDest);
+        console.log(`Imagem de perfil copiada para: ${imgDest}`);
+    } else {
+        console.warn(`Imagem de perfil não encontrada em: ${imgSrc}`);
+    }
+
     // Process posts
     const posts = getAllPosts();
     console.log(`Found ${posts.length} posts`);
-    
+
     // Generate pages
     generatePostPages(posts);
     generateHomePage(posts);
     generateAboutPage();
-    
+
     console.log('✅ Build completed successfully!');
     console.log(`📁 Output directory: ${PUBLIC_DIR}`);
-    
+
     if (posts.length > 0) {
         console.log('\n📝 Posts generated:');
         posts.forEach(post => {
